@@ -5,11 +5,9 @@ const client = new Client({ intents: [
     GatewayIntentBits.GuildVoiceStates
 ],
 partials: [Partials.Channel] });
-const token = require('./token.json');
-const serverGuild = '967045453164212284';
-const channelID = '967045453164212287'
-
-//const { options, guild, member } = interaction;
+const setting = require('./setting.json');
+const token = setting.token;
+const channelID = setting.channelID;
 
 let notificationChannel;
 
@@ -17,7 +15,7 @@ let notificationChannel;
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
 
-    //let notificationChannel = client.guilds.cache.get(channelID);
+    notificationChannel = client.channels.cache.get(channelID);
 });
 
 client.on('messageCreate', msg => {
@@ -25,13 +23,18 @@ client.on('messageCreate', msg => {
 });
 
 client.on('voiceStateUpdate', (oldVoiceState, newVoiceState) => { // Listeing to the voiceStateUpdate event
+    var today = new Date();
+    var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    var dateTime = date+' '+time;
+
     if (newVoiceState.channel) { // The member connected to a channel.
-        console.log(`${newVoiceState.member.user.tag} connected to ${newVoiceState.channel.name}.`);
-        notificationChannel.send(`${newVoiceState.member.user.tag} connected to ${newVoiceState.channel.name}.`);
+        console.log(`${dateTime} ${newVoiceState.member.user.tag} connected to ${newVoiceState.channel.name}.`);
+        notificationChannel.send(`${dateTime} ${newVoiceState.member.user.tag} connected to ${newVoiceState.channel.name}.`);
     } else if (oldVoiceState.channel) { // The member disconnected from a channel.
-        console.log(`${oldVoiceState.member.user.tag} disconnected from ${oldVoiceState.channel.name}.`)
-        notificationChannel.send(`${oldVoiceState.member.user.tag} disconnected from ${oldVoiceState.channel.name}.`);
+        console.log(`${dateTime} ${oldVoiceState.member.user.tag} disconnected from ${oldVoiceState.channel.name}.`)
+        notificationChannel.send(`${dateTime} ${oldVoiceState.member.user.tag} disconnected from ${oldVoiceState.channel.name}.`);
     };
 });
 
-client.login(token.token);
+client.login(token);
